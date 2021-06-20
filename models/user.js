@@ -22,7 +22,7 @@ const userSchema=new schema({
     posts:[
     {
         type:schema.Types.ObjectID,
-        ref:'POST'
+        ref:'Post'
     }]
 });
 

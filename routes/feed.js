@@ -6,7 +6,7 @@ const feedController=require('../controller/feeds');
 const isAuth=require('../middleware/is-auth');
 
 router.get('/posts',isAuth,feedController.getPosts);
-router.post('/posts',
+router.post('/posts',isAuth,
 [body('title')
 .trim()
 .isLength({min:5}),
@@ -18,7 +18,7 @@ feedController.createPosts);
 
 router.get('/post/:postId',isAuth,feedController.getPost);
 
-router.put('/posts/:postId',
+router.put('/posts/:postId',isAuth,
 [body('title')
 .trim()
 .isLength({min:5}),
