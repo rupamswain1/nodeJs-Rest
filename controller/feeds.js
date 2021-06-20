@@ -5,30 +5,26 @@ const fs=require('fs');
 const User=require('../models/user');
 
 let totalItems;
-exports.getPosts=(req,res,next)=>{
+exports.getPosts=async (req,res,next)=>{
     let currentPage=req.query.page||1;
     let perPage=2;
-    Post.find()
-    .countDocuments()
-    .then(count=>{
-        totalItems=count;
-        return Post.find()
-        .skip((currentPage-1)*perPage).limit(perPage)
-    })
-    .then(posts=>{
-        res.status(200)
+    try{
+    const totalItems=await Post.find().countDocuments();
+    const posts=await Post.find().populate('creator')
+        .skip((currentPage-1)*perPage).limit(perPage); 
+    
+    res.status(200)
         .json({posts:posts,message:'fetched successfully',totalItems:totalItems})
-    })
-    .catch(err=>{
+    }catch(err){
         if(!err.statusCode){
             err.statusCode=500;
         }
         next(err);
-    })
+    }
 
 };
 
-exports.createPosts=(req,res,next)=>{
+exports.createPosts=async (req,res,next)=>{
     let creator;
     const title=req.body.title;
     const content=req.body.title;
@@ -52,28 +48,24 @@ exports.createPosts=(req,res,next)=>{
         imageUrl:imageUrl,
 
     })
-    post.save()
-    .then(result=>{
-        return User.findById(req.userId);
-    })
-    .then(user=>{
-        creator=user;
-        user.posts.push(post);
-        return user.save();
-    })
-    .then(result=>{
-        res.status(201).json({
+    try{
+    const result=await post.save();
+    const user= await User.findById(req.userId);
+    user.posts.push(post);
+    const savedUser=await user.save();
+            res.status(201).json({
             message:"Post created successfully",
             post:post,
-            creator:{_id:creator._id,name:creator.name}
-        })
-    })
-    .catch(err=>{
+            creator:{_id:user._id,name:user.name}
+            })
+    
+    }
+    catch(err){
         if(!err.statusCode){
             err.statusCode=500;
         }
         next(err);
-    })
+    }
 };
 
 exports.getPost=(req,res,next)=>{
