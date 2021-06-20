@@ -1,7 +1,7 @@
 const mongoose=require('mongoose');
 const schema=mongoose.Schema;
 
-const userSchema=new Schema({
+const userSchema=new schema({
     email:{
         type:String,
         required:true
@@ -16,12 +16,12 @@ const userSchema=new Schema({
     },
     status:{
         type:String,
-        required:true
+        default:'new'
     },
 
     posts:[
     {
-        type:Schema.Types.ObjectID,
+        type:schema.Types.ObjectID,
         ref:'POST'
     }]
 });
