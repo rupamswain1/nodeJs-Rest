@@ -3,11 +3,11 @@ const Post=require('../models/posts');
 const path=require('path')
 const fs=require('fs');
 const User=require('../models/user');
-
+const io=require('../socket');
 let totalItems;
 exports.getPosts=async (req,res,next)=>{
     let currentPage=req.query.page||1;
-    let perPage=2;
+    let perPage=4;
     try{
     const totalItems=await Post.find().countDocuments();
     const posts=await Post.find().populate('creator')
@@ -53,6 +53,7 @@ exports.createPosts=async (req,res,next)=>{
     const user= await User.findById(req.userId);
     user.posts.push(post);
     const savedUser=await user.save();
+    io.getIO().emit('post',{action:'create',post:post});
             res.status(201).json({
             message:"Post created successfully",
             post:post,

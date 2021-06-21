@@ -53,9 +53,9 @@ app.use((error,req,res,next)=>{
 
 mongoose.connect('mongodb+srv://rupam123:rupam123@nodecluster.plaky.mongodb.net/NodeRest?retryWrites=true&w=majority')
 .then(result=>{
-    console.log('<<<<<<server is up>>>>>>>>')
+    console.log('<<<<<<<<<<<<server is up and Running>>>>>>>>>>>>>>>>>>>>>>>>')
     const server=app.listen(8000);
-    const io=require('socket.io')(server, { cors: { origin: '*' } });
+    const io=require('./socket').init(server);
     io.on('connection',socket=>{
         console.log('client connected')
     })
