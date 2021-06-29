@@ -10,7 +10,7 @@ exports.getPosts=async (req,res,next)=>{
     let perPage=4;
     try{
     const totalItems=await Post.find().countDocuments();
-    const posts=await Post.find().populate('creator')
+    const posts=await Post.find().populate('creator').sort({createdAt:-1})
         .skip((currentPage-1)*perPage).limit(perPage); 
     
     res.status(200)
@@ -110,14 +110,14 @@ exports.updatePost=(req,res,next)=>{
         throw error;
     }
     
-    Post.findById(postId)
+    Post.findById(postId).populate('creator')
     .then(post=>{
         if(!post){
             const error=new Error('could not fid post');
             error.statusCode=404;
             throw error;
         }
-        if(!(post.creator.toString()===req.userId)){
+        if(!(post.creator._id.toString()===req.userId)){
             console.log('post==='+post)
             console.log(req.userId)
             const error=new Error('could not update post');
@@ -134,6 +134,9 @@ exports.updatePost=(req,res,next)=>{
 
     })
     .then(result=>{
+        console.log(result)
+        console.log('IO will emit')
+        io.getIO().emit('post',{action:'update',post:result})
         res.status(200).json({message:'post updated',post:result} );
     })
     .catch(err=>{
@@ -170,6 +173,7 @@ exports.deletePost=(req,res,next)=>{
             return user.save();
         })
         .then(afterSave=>{
+            io.getIO().emit('post',{action:'delete',post:postId});
                 res.status(200).json({message:'Deleted Post'})
         })
         .catch(err=>{
