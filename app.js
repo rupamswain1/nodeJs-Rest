@@ -51,7 +51,7 @@ app.use((error,req,res,next)=>{
     res.status(status).json({message:message,data:data});
 })
 
-mongoose.connect('mongodb+srv://rupam123:rupam123@nodecluster.plaky.mongodb.net/NodeRest?retryWrites=true&w=majority')
+mongoose.connect('') //Enter mongoDB key here
 .then(result=>{
     console.log('<<<<<<<<<<<<server is up and Running>>>>>>>>>>>>>>>>>>>>>>>>')
     const server=app.listen(8000);
